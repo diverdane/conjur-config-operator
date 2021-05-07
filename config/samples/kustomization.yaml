@@ -1,0 +1,4 @@
+## Append samples you want in your CSV to this file as resources ##
+resources:
+- conjur_v1alpha1_conjurconfig.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples

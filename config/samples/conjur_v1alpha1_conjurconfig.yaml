@@ -1,0 +1,7 @@
+apiVersion: conjur.cyberark.com/v1alpha1
+kind: ConjurConfig
+metadata:
+  name: conjurconfig-sample
+spec:
+  # Add fields here
+  foo: bar
