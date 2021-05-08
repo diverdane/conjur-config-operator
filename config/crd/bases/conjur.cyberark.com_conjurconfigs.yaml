@@ -36,17 +36,17 @@ spec:
           spec:
             description: ConjurConfigSpec defines the desired state of ConjurConfig
             properties:
-              config_map_name:
+              configMapName:
                 description: ConfigMapName is the name of the Conjur Connection ConfigMap
                   to be created.
                 type: string
-              role_binding_name:
+              roleBindingName:
                 description: RoleBindingName is the name of the RoleBinding to be
                   created for the Conjur Kubernetes authenticator.
                 type: string
             required:
-            - config_map_name
-            - role_binding_name
+            - configMapName
+            - roleBindingName
             type: object
           status:
             description: ConjurConfigStatus defines the observed state of ConjurConfig

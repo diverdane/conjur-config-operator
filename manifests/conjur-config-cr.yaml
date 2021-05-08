@@ -1,0 +1,7 @@
+apiVersion: "conjur.cyberark.com/v1alpha1"
+kind: ConjurConfig
+metadata:
+  name: my-conjur-config-cr
+spec:
+  configMapName: "conjur-conn-configmap"
+  roleBindingName: "conjur-rolebinding"

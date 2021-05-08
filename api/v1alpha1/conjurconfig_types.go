@@ -30,11 +30,11 @@ type ConjurConfigSpec struct {
 
 	// ConfigMapName is the name of the Conjur Connection ConfigMap to be
 	// created.
-	ConfigMapName string `json:"config_map_name"`
+	ConfigMapName string `json:"configMapName"`
 
 	// RoleBindingName is the name of the RoleBinding to be created for
 	// the Conjur Kubernetes authenticator.
-	RoleBindingName string `json:"role_binding_name"`
+	RoleBindingName string `json:"roleBindingName"`
 }
 
 // ConjurConfigStatus defines the observed state of ConjurConfig

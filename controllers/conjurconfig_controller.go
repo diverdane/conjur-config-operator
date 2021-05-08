@@ -82,11 +82,11 @@ func (r *ConjurConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new ConfigMap
 		cm := r.configMapForConjurConfig(conjurConfig)
-		log.Info("Creating a new ConfigMap", "ConfigMap.Name", cmName,
-			"ConfigMap.Namespace", cmNamespace)
+		log.Info("Creating a new ConfigMap, ", "ConfigMap.Name: ", cmName,
+			"ConfigMap.Namespace: ", cmNamespace)
 		err = r.Create(ctx, cm)
 		if err != nil {
-			log.Error(err, "Failed to create new ConfigMap", "ConfigMap.Name", cm.Name, "ConfigMap.Namespace", cm.Namespace)
+			log.Error(err, "Failed to create new ConfigMap, ", "ConfigMap.Name: ", cm.Name, "ConfigMap.Namespace: ", cm.Namespace)
 			return ctrl.Result{}, err
 		}
 		// ConfigMap created successfully - return and requeue
