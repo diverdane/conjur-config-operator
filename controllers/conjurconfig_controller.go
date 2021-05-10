@@ -33,6 +33,10 @@ import (
 	conjurv1alpha1 "github.com/diverdane/conjur-config-operator/api/v1alpha1"
 )
 
+const (
+	defaultConfigMapName = "conjur-connect-configmap"
+)
+
 // ConjurConfigReconciler reconciles a ConjurConfig object
 type ConjurConfigReconciler struct {
 	client.Client
@@ -76,12 +80,12 @@ func (r *ConjurConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request
 
 	// Check if the ConfigMap already exists, if not create a new one
 	found := &v1.ConfigMap{}
-	cmName := conjurConfig.Spec.ConfigMapName
+	cmName := getConfigMapName(conjurConfig)
 	cmNamespace := conjurConfig.Namespace
 	err = r.Get(ctx, types.NamespacedName{Name: cmName, Namespace: cmNamespace}, found)
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new ConfigMap
-		cm := r.configMapForConjurConfig(conjurConfig)
+		cm := r.configMapForConjurConfig(conjurConfig, cmName)
 		log.Info("Creating a new ConfigMap, ", "ConfigMap.Name: ", cmName,
 			"ConfigMap.Namespace: ", cmNamespace)
 		err = r.Create(ctx, cm)
@@ -103,15 +107,24 @@ func (r *ConjurConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	return ctrl.Result{}, nil
 }
 
+func getConfigMapName(config *conjurv1alpha1.ConjurConfig) string {
+	name := config.Spec.ConfigMapName
+	if name == "" {
+		name = defaultConfigMapName
+		log.Info("Using default name '%s' for Conjur Connect ConfigMap", name)
+	}
+	return name
+}
+
 // configMapForConjurConfig returns a Conjur connect ConfigMap object
 func (r *ConjurConfigReconciler) configMapForConjurConfig(
-	c *conjurv1alpha1.ConjurConfig) *v1.ConfigMap {
+	c *conjurv1alpha1.ConjurConfig, name string) *v1.ConfigMap {
 
 	ls := labelsForConjurConfig(c.Name)
 
 	configMap := &v1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      c.Spec.ConfigMapName,
+			Name:      name,
 			Namespace: c.Namespace,
 			Labels:    ls,
 		},
