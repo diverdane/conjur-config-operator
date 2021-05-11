@@ -18,6 +18,8 @@ package controllers
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/go-logr/logr"
 	log "github.com/sirupsen/logrus"
@@ -86,7 +88,7 @@ func (r *ConjurConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new ConfigMap
 		cm := r.configMapForConjurConfig(conjurConfig, cmName)
-		log.Info("Creating a new ConfigMap, ", "ConfigMap.Name: ", cmName,
+		log.Info("Creating a NEW ConfigMap, ", "ConfigMap.Name: ", cmName,
 			"ConfigMap.Namespace: ", cmNamespace)
 		err = r.Create(ctx, cm)
 		if err != nil {
@@ -129,7 +131,12 @@ func (r *ConjurConfigReconciler) configMapForConjurConfig(
 			Labels:    ls,
 		},
 		Data: map[string]string{
-			"CONJUR_APPLIANCE_URL": "https://conjur-oss.conjur-oss.svc.cluster.local",
+			"CONJUR_ACCOUNT":       os.Getenv("conjurAccount"),
+			"CONJUR_APPLIANCE_URL": os.Getenv("conjurApplianceUrl"),
+			"CONJUR_AUTHN_URL": fmt.Sprintf("%s/authn-k8s/%s",
+				os.Getenv("conjurApplianceUrl"),
+				os.Getenv("authnK8sAuthenticatorID")),
+			"CONJUR_SSL_CERTIFICATE": os.Getenv("conjurSslCertificate"),
 		},
 	}
 	// Set ConjurConfig instance as the owner and controller
