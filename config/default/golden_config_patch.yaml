@@ -1,5 +1,5 @@
-# This patch inject a sidecar container which is a HTTP proxy for the
-# controller manager, it performs RBAC authorization against the Kubernetes API using SubjectAccessReviews.
+# This patch injects Conjur Connection info via a "Golden" Conjur ConfigMap
+# into the controller manager manifest.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
