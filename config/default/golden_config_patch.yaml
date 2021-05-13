@@ -13,3 +13,10 @@ spec:
         envFrom:
         - configMapRef: 
             name: authn-k8s-configmap
+        volumeMounts:
+        - name: conjur-config
+          mountPath: /etc/conjur
+      volumes:
+      - name: conjur-config
+        configMap:
+          name: authn-k8s-configmap

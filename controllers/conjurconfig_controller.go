@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/go-logr/logr"
@@ -88,7 +89,7 @@ func (r *ConjurConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new ConfigMap
 		cm := r.configMapForConjurConfig(conjurConfig, cmName)
-		log.Info("Creating a NEW ConfigMap, ", "ConfigMap.Name: ", cmName,
+		log.Info("Creating a new ConfigMap, ", "ConfigMap.Name: ", cmName,
 			"ConfigMap.Namespace: ", cmNamespace)
 		err = r.Create(ctx, cm)
 		if err != nil {
@@ -124,6 +125,19 @@ func (r *ConjurConfigReconciler) configMapForConjurConfig(
 
 	ls := labelsForConjurConfig(c.Name)
 
+	conjurAccount := os.Getenv("conjurAccount")
+	b, err := ioutil.ReadFile("/etc/conjur/conjurAccount")
+	if err == nil {
+		log.Info("Found conjurAccount file, using instead of env var")
+		conjurAccount = string(b)
+	}
+	conjurSslCertificate := os.Getenv("conjurSslCertificate")
+	b, err = ioutil.ReadFile("/etc/conjur/conjurSslCertificate")
+	if err == nil {
+		log.Info("Found conjurSslCertificate file, using instead of env var")
+		conjurSslCertificate = string(b)
+	}
+
 	configMap := &v1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
@@ -131,12 +145,12 @@ func (r *ConjurConfigReconciler) configMapForConjurConfig(
 			Labels:    ls,
 		},
 		Data: map[string]string{
-			"CONJUR_ACCOUNT":       os.Getenv("conjurAccount"),
+			"CONJUR_ACCOUNT":       conjurAccount,
 			"CONJUR_APPLIANCE_URL": os.Getenv("conjurApplianceUrl"),
 			"CONJUR_AUTHN_URL": fmt.Sprintf("%s/authn-k8s/%s",
 				os.Getenv("conjurApplianceUrl"),
 				os.Getenv("authnK8sAuthenticatorID")),
-			"CONJUR_SSL_CERTIFICATE": os.Getenv("conjurSslCertificate"),
+			"CONJUR_SSL_CERTIFICATE": conjurSslCertificate,
 		},
 	}
 	// Set ConjurConfig instance as the owner and controller
